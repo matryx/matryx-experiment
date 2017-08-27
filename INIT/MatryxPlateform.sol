@@ -1,8 +1,8 @@
 pragma solidity ^0.4.0;
 
+import "MatryxBounty.sol";
 
-
-contract Matryx
+contract MatryxPlateform
 {
 
     address owner;
@@ -15,7 +15,7 @@ contract Matryx
 
     function bounty(uint256 start, uint256 end, uint32 rounds, uint256 reviewDelay)
     {
-        bounties.push(new Bounty(start, end, rounds, reviewDelay));
+        bounties.push(new MatryxBounty(start, end, rounds, reviewDelay));
     }
 
 }
