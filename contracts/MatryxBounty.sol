@@ -1,21 +1,39 @@
 pragma solidity ^0.4.13;
 
+import './Round.sol';
+import './math/SafeMath.sol';
+
 /**
- * @title Matryx 
- * @dev Alpha version of the Matryx bounty system. This is a controller
- * contract to register the bounties and create new bounty contracts
+ * @title MatryxBounty
+ * @dev Representing each bounty
  *
- * This contract is meant to provided as a proof of concept only
+ * 
  */
 contract MatryxBounty
 {
-
+    using SafeMath for uint256;
     address public owner;
     address[] public bounties;
     uint256 public start;
     uint256 public end;
     uint256 public rounds;
     uint256 public reviewDelay;
+    uint256 public currRound;
+
+    /** State machine
+    *
+    * - Preparing: before all submissions
+    * - Submitting: period in which submissions may be entered
+    * - Reviewing: period of time for reward review
+    */
+    enum State{Preparing, Submitting, Reviewing}
+
+    // modifiers
+    modifier canSubmit() {
+        bool submit = now >= start && now <= end;
+        if(!submit) throw;
+        _;
+    }
 
     function MatryxBounty(uint256 _start, uint256 _end, uint256 _rounds, uint256 _reviewDelay)
     {
@@ -32,4 +50,19 @@ contract MatryxBounty
         reviewDelay = _reviewDelay;
     }
 
+    function submit() canSubmit() {
+
+    }
+
+    function setWinner() {
+        currRound = currRound.add(1);
+    }
+
+    function reclaimFunds() {
+
+    }
+
+    function getRound() internal {
+
+    }
 }
