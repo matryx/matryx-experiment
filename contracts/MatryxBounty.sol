@@ -12,6 +12,7 @@ import './math/SafeMath.sol';
 contract MatryxBounty
 {
     using SafeMath for uint256;
+
     address public owner;
     address[] public bounties;
     uint256 public start;
@@ -55,7 +56,9 @@ contract MatryxBounty
     }
 
     function setWinner() {
-        currRound = currRound.add(1);
+        if(currRound.add(1) <= rounds) {
+            currRound = currRound.add(1);
+        }
     }
 
     function reclaimFunds() {
