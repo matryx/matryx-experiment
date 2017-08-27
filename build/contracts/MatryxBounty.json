@@ -1,0 +1,114 @@
+{
+  "contract_name": "MatryxBounty",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "rounds",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "start",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "reviewDelay",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "bounties",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "end",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "name": "_start",
+          "type": "uint256"
+        },
+        {
+          "name": "_end",
+          "type": "uint256"
+        },
+        {
+          "name": "_rounds",
+          "type": "uint256"
+        },
+        {
+          "name": "_reviewDelay",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "constructor"
+    }
+  ],
+  "unlinked_binary": "0x6060604052341561000f57600080fd5b6040516080806102db833981016040528080519190602001805191906020018051919060200180519150505b4284101561004857600080fd5b8383101561005557600080fd5b6000821161006257600080fd5b6000811161006f57600080fd5b60008054600160a060020a03191633600160a060020a031617905560028490556003839055600482905560058190555b505050505b610228806100b36000396000f300606060405236156100755763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416638da5cb5b811461007a578063a2e800ad146100b6578063be9a6555146100db578063c8f83de014610100578063dc2f874414610125578063efbe1c1c14610164575b600080fd5b341561008557600080fd5b61008d610189565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f35b34156100c157600080fd5b6100c96101a5565b60405190815260200160405180910390f35b34156100e657600080fd5b6100c96101ab565b60405190815260200160405180910390f35b341561010b57600080fd5b6100c96101b1565b60405190815260200160405180910390f35b341561013057600080fd5b61008d6004356101b7565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f35b341561016f57600080fd5b6100c96101f6565b60405190815260200160405180910390f35b60005473ffffffffffffffffffffffffffffffffffffffff1681565b60045481565b60025481565b60055481565b60018054829081106101c557fe5b906000526020600020900160005b915054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b600354815600a165627a7a723058202e4bf92be9017719b6ccf56918c51590d75cb16e31b24275f365c776b189d7cb0029",
+  "networks": {},
+  "schema_version": "0.0.5",
+  "updated_at": 1503792329801
+}
