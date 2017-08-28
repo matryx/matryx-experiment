@@ -66,9 +66,6 @@ contract MatryxRound
 
     function submit(address _submitter, bytes url, address payout) payable
     {
-        require(closed == false);
-        require(now > startTime);
-        require(now < endTime);
         require(msg.value >= entryFee);
 
         collectedFees = collectedFees.add(msg.value);
@@ -152,7 +149,7 @@ contract MatryxRound
         submissions[tx.origin].refunded = true;
         collectedFees = collectedFees.sub(entryFee);
         tx.origin.send(entryFee);
-        
+
         //require(submissionIdx < submissions.length);
         //require(msg.sender == submissions[submissionIdx].owner);
         //require(submissions[submissionIdx].refunded == false);
