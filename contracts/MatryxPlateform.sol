@@ -9,7 +9,7 @@ import './MatryxBounty.sol';
  *
  * This contract is meant to provided as a proof of concept only
  */
-contract Matryx
+contract MatryxPlateform
 {
 
     address owner;
@@ -21,9 +21,9 @@ contract Matryx
     }
 
     // Creates new bounty contracts and registers them
-    function createBounty(uint256 start, uint256 end, uint32 rounds, uint256 reviewDelay)
+    function createBounty(uint256 start, uint256 end, uint32 rounds, uint256 reviewTime, uint256 entryFee)
     {
-        bounties.push(new MatryxBounty(start, end, rounds, reviewDelay));
+        bounties.push(new MatryxBounty(start, end, rounds, reviewTime, entryFee));
     }
 
 }
