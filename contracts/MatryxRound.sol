@@ -1,15 +1,14 @@
 pragma solidity ^0.4.13;
 
 import './math/SafeMath.sol';
+import './ownership/Ownable.sol';
 
 /**
  */
-contract MatryxRound
+contract MatryxRound is Ownable
 {
 
     using SafeMath for uint256;
-
-    address public owner;
 
     struct MatryxSubmission
     {
@@ -60,11 +59,10 @@ contract MatryxRound
 
         closed = false;
 
-        //change ownership from calling contract to msg.sender
-        owner = tx.origin;
+        // keep ownership on the bounty contract
     }
 
-    function submit(address _submitter, bytes url, address payout) payable
+    function submit(address _submitter, bytes url, address payout) onlyOwner payable
     {
         require(msg.value >= entryFee);
 
@@ -82,7 +80,7 @@ contract MatryxRound
 
     }
 
-    function rate(address _submitter, uint256 rating)
+    function rate(address _submitter, uint256 rating) onlyOwner
     {
         require(closed == false);
         require(now > endTime);
@@ -93,7 +91,7 @@ contract MatryxRound
         submissions[_submitter].rating = rating;
     }
 
-    function pay(address _submitter) payable {
+    function pay(address _submitter) onlyOwner payable {
         require(closed == true);
         require(submissions[_submitter].owner != 0x0);
 
@@ -103,13 +101,10 @@ contract MatryxRound
 
     }
 
-    function close(address _winner, uint256 _totalRating)
+    function close(address _winner, uint256 _totalRating) onlyOwner
     {
         require(closed == false);
-        require(now > endTime);
-        require(now < refundTime);
         // only the owner can close a round
-        require(tx.origin == owner);
 
         // uint256 i = 0;
         // uint256 totalRating = 0;
