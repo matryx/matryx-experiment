@@ -15,28 +15,44 @@ contract MatryxBounty is Ownable
     address[] public rounds;
     uint256 public start;
     uint256 public end;
-    uint256 maxRounds;
-    uint256 reviewDelay;
-    uint256 currRound;
-    uint256 entryFee;
+    uint256 public maxRounds;
+    uint256 public reviewDelay;
+    uint256 public currRound;
+    uint256 public entryFee;
+    uint256 public bounty;
+    uint256 public roundBounty;
+
+    uint256 public roundOpenDuration;
+    uint256 public roundTotalDuration;
 
     /** State machine
     *
     * - Preparing: before all submissions
     * - Submitting: period in which submissions may be entered
     * - Reviewing: period of time for reward review
+    * - Finalized: After the bounty has completed
     */
     
-    enum State{Preparing, Submitting, Reviewing}
+    enum State{Preparing, Submitting, Reviewing, Finalized}
 
     // modifiers
-    modifier canSubmit() {
-        require(getState() == State.Submitting);
+    modifier canSubmit(uint256 i) {
+        require(getState(i) == State.Submitting);
+        _;
+    }
+
+    modifier canPay(uint256 i) {
+        require(getState(i) == State.Reviewing);
+        _;
+    }
+
+    modifier canRefund(uint256 i) {
+        require(getState(i) == State.Finalized);
         _;
     }
     
 
-    function MatryxBounty(uint256 _start, uint256 _end, uint256 _rounds, uint256 _reviewDelay, uint256 _entryFee)
+    function MatryxBounty(uint256 bounty, uint256 _start, uint256 _end, uint256 _rounds, uint256 _reviewDelay, uint256 _entryFee)
     {
         require(_start >= now);
         require(_end > _start);
@@ -51,14 +67,18 @@ contract MatryxBounty is Ownable
         reviewDelay = _reviewDelay;
         currRound = 0;
         entryFee = _entryFee;
+        bounty = 0;
 
         //rounds.push(new MatryxRound(start, end, reviewDelay, entryFee, 0));
 
         // Round open duration == (BountyEnd - BountyStart) / RoundNumber
-        uint256 roundOpenDuration = (_end.sub(_start)).div(_rounds);
+        roundOpenDuration = (_end.sub(_start)).div(_rounds);
 
         // Round total duration == RoundOpenDuration + ReviewDelay
-        uint256 roundTotalDuration = roundOpenDuration.add(_reviewDelay);
+        roundTotalDuration = roundOpenDuration.add(_reviewDelay);
+
+        // calculate the bounty per round
+        roundBounty = bounty.div(_rounds);
 
         for (uint256 i = 0; i < _rounds; i++)
         {
@@ -69,26 +89,61 @@ contract MatryxBounty is Ownable
                 rstart,
                 rend,
                 rrefund,
-                _entryFee,
+                _entryFee,,
+                roundBounty,
                 i
             ));
         }
     }
 
-    function submit(bytes _submission, address _payout) canSubmit() payable {
+    function supplyBounty() payable {
+        bounty = msg.value;
+    }
+
+    function submit(bytes _submission, address _payout, uint256 _roundNum) canSubmit(_roundNum) payable {
         require(msg.value == entryFee);
-        MatryxRound thisRound = MatryxRound(rounds[currRound]);
-        thisRound.submit.value(msg.value)(_submission, _payout);
+        MatryxRound thisRound = MatryxRound(rounds[_roundNum]);
+        thisRound.submit.value(msg.value)(msg.sender, _submission, _payout);
+    }
+
+    function pay(address _submitter, uint256 _roundNum) onlyOwner canPay(_roundNum) {
+        MatryxRound r = MatryxRound(rounds[_roundNum]);
+        uint256 rating = r.getRating(_submitter);
+        uint256 totalRating = r.getTotalRating();
+
+        uint256 compensation = totalRating.div(rating);
+        compensation = roundBounty.mul(compensation);
+        r.pay.value()
+    }
+
+    function refund(uint256 _roundNum) canRefund(_roundNum) {
+        address submissionOwner = MatryxRound(rounds[_roundNum]).getSubmitter();
+        require(msg.sender == submissionOwner);
+
+
     }
 
 
     /**
-    * Crowdfund state machine management
+    * Bounty state machine management
     *
     */
-    function getState() public constant returns (State) {
-        if(now < start) return State.Preparing;
+    function getState(uint256 _roundNum) public constant returns (State) {
+        require(_roundNum > 0 && _roundNum <= maxRounds);
 
+        uint256 roundStart = MatryxRound(rounds[_roundNum]).getStart();
+        uint256 roundEnd = MatryxRound(rounds[_roundNum]).getEnd();
+        uint256 refundStart = MatryxRound(rounds[_roundNum]).getRefundTime();
+
+        if(now < roundStart) {
+            return State.Preparing;
+        } else if(now < roundEnd && now > roundStart) {
+            return State.Submitting;
+        } else if(now < refundStart && now > roundEnd) {
+            return State.Reviewing;
+        } else {
+            return State.Finalized;
+        }
     }
 
 }
