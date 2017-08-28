@@ -13,7 +13,7 @@ contract MatryxRound
     {
         address owner;
         address payout;
-        string url; // Now store content within URL, will use Decentralized storage in the future
+        bytes url; // Now store content within URL, will use Decentralized storage in the future
         uint256 rating;
         uint256 time;
         bool refunded;
@@ -51,7 +51,7 @@ contract MatryxRound
         closed = false;
     }
 
-    function submit(string url, address payout)
+    function submit(bytes url, address payout) payable
     {
         require(closed == false);
         require(now > startTime);

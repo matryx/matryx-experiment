@@ -13,6 +13,27 @@ contract MatryxBounty is Ownable
     using SafeMath for uint256;
 
     address[] public rounds;
+    uint256 public start;
+    uint256 public end;
+    uint256 maxRounds;
+    uint256 currRound;
+    uint256 entryFee;
+
+    /** State machine
+    *
+    * - Preparing: before all submissions
+    * - Submitting: period in which submissions may be entered
+    * - Reviewing: period of time for reward review
+    */
+    
+    enum State{Preparing, Submitting, Reviewing}
+
+    // modifiers
+    modifier canSubmit() {
+        require(getState() == State.Submitting);
+        _;
+    }
+    
 
     function MatryxBounty(uint256 _start, uint256 _end, uint256 _rounds, uint256 _reviewDelay, uint256 _entryFee)
     {
@@ -24,41 +45,51 @@ contract MatryxBounty is Ownable
         require(_rounds < 100);
         require(_entryFee > 0);
 
-        // Round open duration == (BountyEnd - BountyStart) / RoundNumber
-        uint256 roundOpenDuration = (_end.sub(_start)).div(_rounds);
+        start = _start;
+        end = _end;
+        maxRounds = _rounds;
+        currRound = 0;
+        entryFee = _entryFee;
 
-        // Round total duration == RoundOpenDuration + ReviewDelay
-        uint256 roundTotalDuration = roundOpenDuration.add(_reviewDelay);
 
-        for (uint256 i = 0; i < _rounds; i++)
-        {
-            uint256 rstart = _start.add(roundTotalDuration.mul(i));
-            uint256 rend = rstart.add(roundOpenDuration);
-            uint256 rrefund = rstart.add(roundTotalDuration);
-            rounds.push(new MatryxRound(
-                rstart,
-                rend,
-                rrefund,
-                _entryFee
-            ));
-        }
+
+        // It's unlikely but there is a case where a bounty could have many rounds
+        // that will make this constructor fail 
+
+        // // Round open duration == (BountyEnd - BountyStart) / RoundNumber
+        // uint256 roundOpenDuration = (_end.sub(_start)).div(_rounds);
+
+        // // Round total duration == RoundOpenDuration + ReviewDelay
+        // uint256 roundTotalDuration = roundOpenDuration.add(_reviewDelay);
+
+        // for (uint256 i = 0; i < _rounds; i++)
+        // {
+        //     uint256 rstart = _start.add(roundTotalDuration.mul(i));
+        //     uint256 rend = rstart.add(roundOpenDuration);
+        //     uint256 rrefund = rstart.add(roundTotalDuration);
+        //     rounds.push(new MatryxRound(
+        //         rstart,
+        //         rend,
+        //         rrefund,
+        //         _entryFee
+        //     ));
+        // }
     }
 
-    /** State machine
+    function submit(bytes _submission, address _payout) canSubmit() payable {
+        require(msg.value == entryFee);
+        MatryxRound thisRound = MatryxRound(rounds[currRound]);
+        thisRound.submit.value(msg.value)(_submission, _payout);
+    }
+
+
+    /**
+    * Crowdfund state machine management
     *
-    * - Preparing: before all submissions
-    * - Submitting: period in which submissions may be entered
-    * - Reviewing: period of time for reward review
     */
-    /*
-    enum State{Preparing, Submitting, Reviewing}
+    function getState() public constant returns (State) {
+        if(now < start) return State.Preparing;
 
-    // modifiers
-    modifier canSubmit() {
-        bool submit = now >= start && now <= end;
-        if(!submit) throw;
-        _;
     }
-    */
 
 }
