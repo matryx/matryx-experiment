@@ -25,6 +25,7 @@ contract MatryxRound
 
     uint256 public bounty;
     uint256 public entryFee;
+    uint256 public collectedFees;
 
     //MatryxSubmission[] public submissions;
     address public subAddresses;
@@ -36,6 +37,8 @@ contract MatryxRound
     uint256 public roundNumber;
     uint256 public numSubmissions;
     uint256 public totalRating = 0;
+
+    address public winner;
 
     function MatryxRound(uint256 _start, uint256 _end, uint256 _refund, uint256 _entryFee, uint256 _bounty, uint256 _roundNumber)
     {
@@ -68,6 +71,8 @@ contract MatryxRound
         require(now < endTime);
         require(msg.value >= entryFee);
 
+        collectedFees = collectedFees.add(msg.value);
+
         MatryxSubmission memory submission;
         submission.owner = msg.sender;
         submission.payout = payout;
@@ -85,13 +90,13 @@ contract MatryxRound
         require(closed == false);
         require(now > endTime);
         require(now < refundTime);
-        // We currently only late the bounty owner rate
+        // We currently only let the bounty owner rate
         require(tx.origin == owner);
 
         submissions[_submitter].rating = rating;
     }
 
-    function pay(address _submitter) {
+    function pay(address _submitter) payable {
         require(closed == true);
         require(submissions[_submitter].owner != 0x0);
 
@@ -101,7 +106,7 @@ contract MatryxRound
 
     }
 
-    function close(address winner, uint256 _totalRating)
+    function close(address _winner, uint256 _totalRating)
     {
         require(closed == false);
         require(now > endTime);
@@ -111,6 +116,7 @@ contract MatryxRound
 
         // uint256 i = 0;
         // uint256 totalRating = 0;
+        winner = _winner;
         totalRating = _totalRating;
 
         // for (i = 0; i < submissions.length; i++)
@@ -136,9 +142,17 @@ contract MatryxRound
         closed = true;
     }
 
-    function refund(address submitter)
+    function refund()
     {
+        require(submissions[tx.origin].owner == tx.origin);
+        require(submissions[tx.origin].refunded == false);
+        require(now > refundTime);
+        require(closed = false);
 
+        submissions[tx.origin].refunded = true;
+        collectedFees = collectedFees.sub(entryFee);
+        tx.origin.send(entryFee);
+        
         //require(submissionIdx < submissions.length);
         //require(msg.sender == submissions[submissionIdx].owner);
         //require(submissions[submissionIdx].refunded == false);

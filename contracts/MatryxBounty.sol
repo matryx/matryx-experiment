@@ -17,7 +17,6 @@ contract MatryxBounty is Ownable
     uint256 public end;
     uint256 public maxRounds;
     uint256 public reviewDelay;
-    uint256 public currRound;
     uint256 public entryFee;
     uint256 public bounty;
     uint256 public roundBounty;
@@ -65,11 +64,8 @@ contract MatryxBounty is Ownable
         end = _end;
         maxRounds = _rounds;
         reviewDelay = _reviewDelay;
-        currRound = 0;
         entryFee = _entryFee;
         bounty = 0;
-
-        //rounds.push(new MatryxRound(start, end, reviewDelay, entryFee, 0));
 
         // Round open duration == (BountyEnd - BountyStart) / RoundNumber
         roundOpenDuration = (_end.sub(_start)).div(_rounds);
@@ -89,7 +85,7 @@ contract MatryxBounty is Ownable
                 rstart,
                 rend,
                 rrefund,
-                _entryFee,,
+                _entryFee,
                 roundBounty,
                 i
             ));
@@ -106,21 +102,18 @@ contract MatryxBounty is Ownable
         thisRound.submit.value(msg.value)(msg.sender, _submission, _payout);
     }
 
-    function pay(address _submitter, uint256 _roundNum) onlyOwner canPay(_roundNum) {
+    function pay(address _submitter, uint256 _roundNum) onlyOwner payable canPay(_roundNum) {
         MatryxRound r = MatryxRound(rounds[_roundNum]);
         uint256 rating = r.getRating(_submitter);
         uint256 totalRating = r.getTotalRating();
 
-        uint256 compensation = totalRating.div(rating);
-        compensation = roundBounty.mul(compensation);
-        r.pay.value()
+        uint256 compensation = roundBounty.mul(rating).div(totalRating);
+        r.pay.value(compensation)(_submitter);
     }
 
     function refund(uint256 _roundNum) canRefund(_roundNum) {
-        address submissionOwner = MatryxRound(rounds[_roundNum]).getSubmitter();
-        require(msg.sender == submissionOwner);
-
-
+        MatryxRound r = MatryxRound(rounds[_roundNum]);
+        r.refund();
     }
 
 
