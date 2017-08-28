@@ -30,8 +30,9 @@ contract MatryxRound
     uint256 startTime;
     uint256 endTime;
     uint256 refundTime;
+    uint256 roundNumber;
 
-    function MatryxRound(uint256 _start, uint256 _end, uint256 _refund, uint256 _entryFee)
+    function MatryxRound(uint256 _start, uint256 _end, uint256 _refund, uint256 _entryFee, uint256 _roundNumber)
     {
         owner = msg.sender;
         bounty = msg.value;
@@ -43,6 +44,7 @@ contract MatryxRound
         startTime = _start;
         endTime = _end;
         refundTime = _refund;
+        roundNumber = _roundNumber;
 
         require(startTime > now);
         require(startTime < endTime);

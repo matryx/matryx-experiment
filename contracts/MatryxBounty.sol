@@ -16,6 +16,7 @@ contract MatryxBounty is Ownable
     uint256 public start;
     uint256 public end;
     uint256 maxRounds;
+    uint256 reviewDelay;
     uint256 currRound;
     uint256 entryFee;
 
@@ -40,40 +41,38 @@ contract MatryxBounty is Ownable
         require(_start >= now);
         require(_end > _start);
         require(_rounds > 0);
-        require(_reviewDelay > 0);
-        require(_reviewDelay < _end.sub(_start).div(_rounds));
+        require(_reviewDelay > 0 && _reviewDelay < _end.sub(_start).div(_rounds));
         require(_rounds < 100);
         require(_entryFee > 0);
 
         start = _start;
         end = _end;
         maxRounds = _rounds;
+        reviewDelay = _reviewDelay;
         currRound = 0;
         entryFee = _entryFee;
 
+        //rounds.push(new MatryxRound(start, end, reviewDelay, entryFee, 0));
 
+        // Round open duration == (BountyEnd - BountyStart) / RoundNumber
+        uint256 roundOpenDuration = (_end.sub(_start)).div(_rounds);
 
-        // It's unlikely but there is a case where a bounty could have many rounds
-        // that will make this constructor fail 
+        // Round total duration == RoundOpenDuration + ReviewDelay
+        uint256 roundTotalDuration = roundOpenDuration.add(_reviewDelay);
 
-        // // Round open duration == (BountyEnd - BountyStart) / RoundNumber
-        // uint256 roundOpenDuration = (_end.sub(_start)).div(_rounds);
-
-        // // Round total duration == RoundOpenDuration + ReviewDelay
-        // uint256 roundTotalDuration = roundOpenDuration.add(_reviewDelay);
-
-        // for (uint256 i = 0; i < _rounds; i++)
-        // {
-        //     uint256 rstart = _start.add(roundTotalDuration.mul(i));
-        //     uint256 rend = rstart.add(roundOpenDuration);
-        //     uint256 rrefund = rstart.add(roundTotalDuration);
-        //     rounds.push(new MatryxRound(
-        //         rstart,
-        //         rend,
-        //         rrefund,
-        //         _entryFee
-        //     ));
-        // }
+        for (uint256 i = 0; i < _rounds; i++)
+        {
+            uint256 rstart = _start.add(roundTotalDuration.mul(i));
+            uint256 rend = rstart.add(roundOpenDuration);
+            uint256 rrefund = rstart.add(roundTotalDuration);
+            rounds.push(new MatryxRound(
+                rstart,
+                rend,
+                rrefund,
+                _entryFee,
+                i
+            ));
+        }
     }
 
     function submit(bytes _submission, address _payout) canSubmit() payable {
