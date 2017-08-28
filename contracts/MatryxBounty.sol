@@ -1,19 +1,16 @@
 pragma solidity ^0.4.13;
 
 import './math/SafeMath.sol';
-
 import './MatryxRound.sol';
-
+import './ownership/Ownable.sol';
 /**
  * @title MatryxBounty
  * @dev Representing each bounty
  */
-contract MatryxBounty
+contract MatryxBounty is Ownable
 {
 
     using SafeMath for uint256;
-
-    address public owner;
 
     address[] public rounds;
 
@@ -25,8 +22,7 @@ contract MatryxBounty
         require(_reviewDelay > 0);
         require(_reviewDelay < _end.sub(_start).div(_rounds));
         require(_rounds < 100);
-
-        owner = msg.sender;
+        require(_entryFee > 0);
 
         // Round open duration == (BountyEnd - BountyStart) / RoundNumber
         uint256 roundOpenDuration = (_end.sub(_start)).div(_rounds);
