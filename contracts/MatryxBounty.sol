@@ -116,12 +116,12 @@ contract MatryxBounty is Ownable
         r.refund();
     }
 
-    function rate(uint256 _roundNum, address _submitter, uint256 rating) canPay(_roundNum) {
+    function rate(uint256 _roundNum, address _submitter, uint256 rating) onlyOwner canPay(_roundNum) {
         MatryxRound r = MatryxRound(rounds[_roundNum]);
         r.rate(_submitter, rating);
     }
 
-    function closeRound(uint256 _roundNum, address _winner, uint256 _totalRating) canPay(_roundNum) {
+    function closeRound(uint256 _roundNum, address _winner, uint256 _totalRating) onlyOwner canPay(_roundNum) {
         MatryxRound r = MatryxRound(rounds[_roundNum]);
         r.close(_winner, _totalRating);
     }

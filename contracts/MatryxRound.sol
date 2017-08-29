@@ -85,8 +85,6 @@ contract MatryxRound is Ownable
         require(closed == false);
         require(now > endTime);
         require(now < refundTime);
-        // We currently only let the bounty owner rate
-        require(tx.origin == owner);
 
         submissions[_submitter].rating = rating;
     }
