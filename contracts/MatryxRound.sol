@@ -102,10 +102,7 @@ contract MatryxRound is Ownable
     function close(address _winner, uint256 _totalRating) onlyOwner
     {
         require(closed == false);
-        // only the owner can close a round
 
-        // uint256 i = 0;
-        // uint256 totalRating = 0;
         winner = _winner;
         totalRating = _totalRating;
 

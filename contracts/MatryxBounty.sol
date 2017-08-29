@@ -102,7 +102,7 @@ contract MatryxBounty is Ownable
         thisRound.submit.value(msg.value)(msg.sender, _submission, _payout);
     }
 
-    function pay(address _submitter, uint256 _roundNum) onlyOwner payable canPay(_roundNum) {
+    function pay(address _submitter, uint256 _roundNum) onlyOwner canPay(_roundNum) {
         MatryxRound r = MatryxRound(rounds[_roundNum]);
         uint256 rating = r.getRating(_submitter);
         uint256 totalRating = r.getTotalRating();
