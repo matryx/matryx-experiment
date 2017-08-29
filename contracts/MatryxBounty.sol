@@ -93,7 +93,7 @@ contract MatryxBounty is Ownable
     }
 
     function supplyBounty() payable {
-        bounty = msg.value;
+        bounty = bounty.add(msg.value);
     }
 
     function submit(bytes _submission, address _payout, uint256 _roundNum) canSubmit(_roundNum) payable {
