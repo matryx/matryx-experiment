@@ -55,9 +55,8 @@ contract MatryxBounty is Ownable
     {
         require(_start >= now);
         require(_end > _start);
-        require(_rounds > 0);
+        require(_rounds > 0 && _rounds < 100);
         require(_reviewDelay > 0 && _reviewDelay < _end.sub(_start).div(_rounds));
-        require(_rounds < 100);
         require(_entryFee > 0);
 
         start = _start;
@@ -66,6 +65,8 @@ contract MatryxBounty is Ownable
         reviewDelay = _reviewDelay;
         entryFee = _entryFee;
         bounty = 0;
+        // Change ownership from MatryxPlatform contract to the bounty creator
+        owner = tx.origin;
 
         // Round open duration == (BountyEnd - BountyStart) / RoundNumber
         roundOpenDuration = (_end.sub(_start)).div(_rounds);
