@@ -27,7 +27,7 @@ contract MatryxRound is Ownable
     uint256 public collectedFees;
 
     //MatryxSubmission[] public submissions;
-    address public subAddresses;
+    address[] public subAddresses;
     mapping(address => MatryxSubmission) submissions;
 
     uint256 public startTime;
@@ -62,7 +62,7 @@ contract MatryxRound is Ownable
         // keep ownership on the bounty contract
     }
 
-    function submit(address _submitter, bytes url, address payout) onlyOwner payable
+    function submit(bytes url, address payout) onlyOwner payable
     {
         require(msg.value >= entryFee);
 
@@ -77,7 +77,7 @@ contract MatryxRound is Ownable
         submission.time = now;
         //submissions.push(submission);
         submissions[tx.origin] = submission;
-
+        subAddresses.push(tx.origin);
     }
 
     function rate(address _submitter, uint256 rating) onlyOwner
@@ -95,7 +95,7 @@ contract MatryxRound is Ownable
 
         bounty = bounty.sub(msg.value);
 
-        _submitter.send(msg.value);
+        _submitter.transfer(msg.value);
 
     }
 
@@ -138,7 +138,7 @@ contract MatryxRound is Ownable
 
         submissions[tx.origin].refunded = true;
         collectedFees = collectedFees.sub(entryFee);
-        tx.origin.send(entryFee);
+        tx.origin.transfer(entryFee);
 
         //require(submissionIdx < submissions.length);
         //require(msg.sender == submissions[submissionIdx].owner);

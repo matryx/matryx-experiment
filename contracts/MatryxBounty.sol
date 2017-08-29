@@ -99,7 +99,7 @@ contract MatryxBounty is Ownable
     function submit(bytes _submission, address _payout, uint256 _roundNum) canSubmit(_roundNum) payable {
         require(msg.value == entryFee);
         MatryxRound thisRound = MatryxRound(rounds[_roundNum]);
-        thisRound.submit.value(msg.value)(msg.sender, _submission, _payout);
+        thisRound.submit.value(msg.value)(_submission, _payout);
     }
 
     function pay(address _submitter, uint256 _roundNum) onlyOwner canPay(_roundNum) {
