@@ -75,7 +75,7 @@ contract MatryxRound is Ownable
         submission.rating = 0;
         submission.refunded = false;
         submission.time = now;
-        //submissions.push(submission);
+
         submissions[tx.origin] = submission;
         subAddresses.push(tx.origin);
     }
@@ -106,26 +106,6 @@ contract MatryxRound is Ownable
         winner = _winner;
         totalRating = _totalRating;
 
-        // for (i = 0; i < submissions.length; i++)
-        // {
-        //     if (submissions[i].rating > 0)
-        //     {
-        //         totalRating = totalRating.add(submissions[i].rating);
-        //     }
-        // }
-
-        // require(totalRating > 0);
-
-        // for (i = 0; i < submissions.length; i++)
-        // {
-        //     // Payout fair share to submission
-        //     // Compensation == Bounty * TotalRating / SubmissionRating
-        //     if (submissions[i].rating > 0)
-        //     {
-        //         uint256 compensation = bounty.mul(totalRating).div(submissions[i].rating);
-        //         // Send compasation to "submissions[i].payout"
-        //     }
-        // }
         closed = true;
     }
 
@@ -139,15 +119,6 @@ contract MatryxRound is Ownable
         submissions[tx.origin].refunded = true;
         collectedFees = collectedFees.sub(entryFee);
         tx.origin.transfer(entryFee);
-
-        //require(submissionIdx < submissions.length);
-        //require(msg.sender == submissions[submissionIdx].owner);
-        //require(submissions[submissionIdx].refunded == false);
-
-        // Refund msg.sender of the "fee" + fair share of the bounty
-        //uint256 compensation = bounty.div(submissions.length).add(entryFee);
-        // Send compensation to "submissions[submissionIdx].payout"
-        //submissions[submissionIdx].refunded = true;
     }
 
     function getStart() external constant returns (uint256) {
